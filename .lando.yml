@@ -1,0 +1,42 @@
+name: symfony-sulu-demo
+recipe: symfony
+config:
+    via: nginx
+    webroot: public
+    php: '8.0'
+services:
+    appserver:
+        composer:
+            phpunit/phpunit: ^9.5
+    node:
+        type: node:14
+        build:
+            - yarn install
+    database:
+        type: mysql
+        portforward: 6969
+        creds:
+            user: su_user
+            password: symfony
+            database: su_demo
+    elasticsearch:
+        type: elasticsearch:7.13.2
+tooling:
+    phpunit:
+        service: appserver
+        description: Run PHP Unit tests in Laravel
+        cmd: php vendor/bin/phpunit
+    admin-console:
+        service: appserver
+        description: Run Symfony Admin Console tests in Laravel
+        cmd: php bin/phpunit adminconsole
+    web-console:
+        service: appserver
+        description: Run Symfony Web Console tests in Laravel
+        cmd: php bin/phpunit websiteconsole
+    npm:
+        service: node
+        cmd: npm
+    yarn:
+        service: node
+        cmd: yarn
